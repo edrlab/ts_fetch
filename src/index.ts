@@ -1,3 +1,2 @@
-
-export { http } from "./http";
-export { fetchCookieFactory, fetchFactory } from "./fetch";
+export {http} from './http';
+export {fetchCookieFactory, fetchFactory} from './fetch';
