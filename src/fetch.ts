@@ -42,13 +42,15 @@ export class fetchCookieFactory {
     ) as typeof nodeFetch; // ignore errors
   }
 
-  public init(data?: string | tough.CookieJar.Serialized) {
+  static init(data?: string | tough.CookieJar.Serialized) {
     if (!fetchCookieFactory._fetch) {
-      new fetchCookieFactory(data);
+      const instance = new fetchCookieFactory(data);
+      return instance;
     }
+    return this;
   }
 
-  get fetch() {
+  static get fetch() {
     if (!fetchCookieFactory._fetch) {
       fetchCookieFactory._fetch = fetchFactory.fetch;
     }
