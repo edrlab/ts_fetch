@@ -17,6 +17,7 @@ export class fetchFactory {
   }
 }
 
+let instance: fetchCookieFactory | null = null;
 export class fetchCookieFactory {
   private static _fetch: typeof nodeFetch;
 
@@ -42,12 +43,16 @@ export class fetchCookieFactory {
     ) as typeof nodeFetch; // ignore errors
   }
 
-  static init(data?: string | tough.CookieJar.Serialized) {
+  static init(data?: string | tough.CookieJar.Serialized): fetchCookieFactory {
     if (!fetchCookieFactory._fetch) {
-      const instance = new fetchCookieFactory(data);
+      instance = new fetchCookieFactory(data);
       return instance;
     }
-    return this;
+    return instance as fetchCookieFactory;
+  }
+
+  static getInstance() {
+    return instance || fetchCookieFactory.init();
   }
 
   static get fetch() {
