@@ -7,7 +7,13 @@
   "files": [
     "build/src"
   ],
-  "license": "Apache-2.0",
+  "license": "BSD-3-Clause",
+  "licenses": [
+    {
+      "type": "BSD-3-Clause",
+      "url": "http://opensource.org/licenses/BSD-3-Clause"
+    }
+  ],
   "keywords": [],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
