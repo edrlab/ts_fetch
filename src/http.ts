@@ -1,6 +1,5 @@
 import * as https from 'https';
 import fetch, {Headers, RequestInit} from 'node-fetch';
-import {AbortSignal as IAbortSignal} from 'node-fetch/externals';
 import {
   IHttpGetResult,
   IAuthenticationToken,
@@ -203,7 +202,7 @@ export class http implements IHttp {
         contentType,
         // cookies: response.headers.get("Set-Cookie"),
       };
-    } catch (err) {
+    } catch (err: any) {
       const errStr = err.toString();
 
       debug('### HTTP FETCH ERROR ###');
@@ -440,6 +439,25 @@ export class http implements IHttp {
   };
 
   public get = this.httpGetWithAuth(true);
+}
+
+// node_modules/@types/node-fetch/externals.d.ts
+interface IAbortSignal {
+    aborted: boolean;
+
+    addEventListener: (type: "abort", listener: ((this: AbortSignal, event: any) => any), options?: boolean | {
+        capture?: boolean | undefined,
+        once?: boolean | undefined,
+        passive?: boolean | undefined
+    }) => void;
+
+    removeEventListener: (type: "abort", listener: ((this: AbortSignal, event: any) => any), options?: boolean | {
+        capture?: boolean | undefined
+    }) => void;
+
+    dispatchEvent: (event: any) => boolean;
+
+    onabort: null | ((this: AbortSignal, event: any) => void);
 }
 
 // fetch checks the class name
