@@ -9,6 +9,7 @@ import {
   THttpResponse,
 } from './http.type';
 import {URL} from 'url';
+import {AuthenticationStorage} from './AuthenticationStorage';
 import {fetchFactory} from './fetch';
 
 // Logger
@@ -61,43 +62,16 @@ interface IHttp {
 }
 
 export class http implements IHttp {
-  private _authenticationToken: Record<string, IAuthenticationToken> = {};
+  private _authenticationStorage: AuthenticationStorage;
   private _fetch: typeof fetch;
 
   constructor(
-    __fetch = fetchFactory.fetch,
-    __authenticationToken: Record<string, IAuthenticationToken> = {}
+    __fetch: typeof fetch | undefined = undefined,
+    __authenticationStorage: AuthenticationStorage | undefined = undefined
   ) {
-    this._fetch = __fetch;
-    this._authenticationToken = __authenticationToken;
-  }
-
-  protected setAuthenticationToken(data: IAuthenticationToken) {
-    if (!data.authenticationUrl) {
-      throw new Error('no opdsAutenticationUrl !!');
-    }
-
-    const url = new URL(data.authenticationUrl);
-    const {host} = url;
-    // do not risk showing plaintext access/refresh tokens in console / command line shell
-    debug('SET opds authentication credentials for', host); // data
-
-    const id = `${Buffer.from(host).toString('base64')}`;
-    this._authenticationToken[id] = data;
-  }
-
-  protected getAuthenticationToken(host: string) {
-    const id = `${Buffer.from(host).toString('base64')}`;
-    return this._authenticationToken[id];
-  }
-
-  protected deleteAuthenticationToken(host: string) {
-    const id = `${Buffer.from(host).toString('base64')}`;
-    delete this._authenticationToken[id];
-  }
-
-  protected wipeAuthenticationStorage() {
-    this._authenticationToken = {};
+    this._fetch = __fetch || fetchFactory.fetch;
+    this._authenticationStorage =
+      __authenticationStorage || new AuthenticationStorage();
   }
 
   private async httpFetchRawResponse(
@@ -305,7 +279,9 @@ export class http implements IHttp {
         const url = _url instanceof URL ? _url : new URL(_url);
         const {host} = url;
 
-        const auth = await this.getAuthenticationToken(host);
+        const auth = await this._authenticationStorage.getAuthenticationToken(
+          host
+        );
 
         if (typeof auth === 'object' && auth.accessToken) {
           // We have an authentication token for this host.
@@ -441,7 +417,7 @@ export class http implements IHttp {
         if (httpGetResponse.statusCode !== 401) {
           debug('authenticate with the new access_token');
           debug('saved it into db');
-          this.setAuthenticationToken(auth);
+          this._authenticationStorage.setAuthenticationToken(auth);
         }
         return httpGetResponse;
       }
