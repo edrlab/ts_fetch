@@ -11,6 +11,9 @@ tokenStorage.setAuthenticationToken({
 
 const _http = new http(undefined, tokenStorage);
 
+_http.locale = 'fr';
+console.log("locale: ", _http.locale);
+
 _http
   .get(
     'https://opds-auth-test-server-aplqpqv3wa-ey.a.run.app/implicit',

@@ -63,22 +63,27 @@ interface IHttp {
 export class http implements IHttp {
   private _authenticationStorage: AuthenticationStorage;
   private _fetch: typeof fetch;
+  private _locale: string;
 
   constructor(
     __fetch: typeof fetch | undefined = undefined,
-    __authenticationStorage: AuthenticationStorage | undefined = undefined
+    __authenticationStorage: AuthenticationStorage | undefined = undefined,
+    __locale = 'en-US'
   ) {
     this._fetch = __fetch || fetchFactory.fetch;
     this._authenticationStorage =
       __authenticationStorage || new AuthenticationStorage();
+    this._locale = __locale;
   }
 
   private async httpFetchRawResponse(
     url: string | URL,
     options: THttpOptions = {},
     redirectCounter = 0,
-    locale = 'en-US'
+    locale = this._locale
   ): Promise<THttpResponse> {
+    this.locale = locale;
+
     options.headers =
       options.headers instanceof Headers
         ? options.headers
@@ -439,6 +444,14 @@ export class http implements IHttp {
   };
 
   public get = this.httpGetWithAuth(true);
+
+  public get locale() {
+    return this._locale;
+  }
+
+  public set locale(l: string) {
+    this._locale = l;
+  }
 }
 
 // node_modules/@types/node-fetch/externals.d.ts
