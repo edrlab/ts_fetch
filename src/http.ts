@@ -89,7 +89,7 @@ export class http implements IHttp {
         ? options.headers
         : new Headers(options.headers || {});
     options.headers.set('user-agent', 'org.edrlab');
-    options.headers.set('accept-language', `${locale},en-US;q=0.7,en;q=0.5`);
+    options.headers.set('accept-language', locale);
     options.redirect = 'manual'; // handle cookies
 
     // https://github.com/node-fetch/node-fetch#custom-agent
